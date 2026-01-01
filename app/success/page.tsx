@@ -1,13 +1,13 @@
-"use client";
-
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
-import { useSearchParams } from "next/navigation";
+type Props = {
+  searchParams: {
+    file?: string;
+  };
+};
 
-export default function SuccessPage() {
-  const searchParams = useSearchParams();
-  const file = searchParams.get("file");
+export default function SuccessPage({ searchParams }: Props) {
+  const file = searchParams.file;
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-6">
