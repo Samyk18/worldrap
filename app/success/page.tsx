@@ -15,15 +15,16 @@ export default function SuccessPage({ searchParams }: Props) {
 
       {file ? (
         <a
-          href={file}
-          download
-          className="bg-white text-black px-6 py-3 rounded hover:bg-gray-300"
-        >
-          Download your file
-        </a>
+  href={`/api/download?session_id=${searchParams.session_id}&file=${file}`}
+  className="bg-white text-black px-6 py-3 rounded hover:bg-gray-300"
+>
+  Download your file
+</a>
+
       ) : (
         <p>No download found.</p>
       )}
     </main>
   );
 }
+
