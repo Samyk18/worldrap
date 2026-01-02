@@ -1,20 +1,16 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
-  const file = searchParams.get("file");
-  const [ready, setReady] = useState(false);
+  const [file, setFile] = useState<string | null>(null);
 
   useEffect(() => {
-    setReady(true);
-  }, []);
-
-  if (!ready) return null;
+    const f = searchParams.get("file");
+    setFile(f);
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-6">
