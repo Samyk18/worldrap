@@ -27,8 +27,13 @@ export default function Shop() {
     });
 
     const data = await res.json();
-    window.location.href = data.url;
-  }; 
+
+    if (data.url) {
+      window.location.href = data.url; // 👈 PRESMEROVANIE NA STRIPE
+    } else {
+      alert("Stripe checkout URL not found");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-10">
@@ -42,6 +47,7 @@ export default function Shop() {
           >
             <h2 className="text-xl mb-4">{p.name}</h2>
             <p className="text-2xl mb-6">${p.price}</p>
+
             <button
               onClick={() => handleBuy(p)}
               className="bg-white text-black px-4 py-2 rounded hover:bg-gray-300"

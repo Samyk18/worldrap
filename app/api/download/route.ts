@@ -1,37 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import fs from "fs";
 import path from "path";
+import { NextResponse } from "next/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const file = searchParams.get("file");
 
-export async function GET(req: NextRequest) {
-  const sessionId = req.nextUrl.searchParams.get("session_id");
-  const file = req.nextUrl.searchParams.get("file");
-
-  if (!sessionId || !file) {
-    return new NextResponse("Missing parameters", { status: 400 });
+  if (!file) {
+    return new NextResponse("Missing file", { status: 400 });
   }
 
-  // Over Stripe session
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-  if (session.payment_status !== "paid") {
-    return new NextResponse("Payment not verified", { status: 403 });
-  }
-
-  const filePath = path.join(process.cwd(), "protected-files", file);
+  const filePath = path.join(process.cwd(), "private_downloads", file);
 
   if (!fs.existsSync(filePath)) {
     return new NextResponse("File not found", { status: 404 });
   }
 
-  const fileBuffer = fs.readFileSync(filePath);
+  const buffer = fs.readFileSync(filePath);
 
-  return new NextResponse(fileBuffer, {
+  return new NextResponse(buffer, {
     headers: {
-      "Content-Type": "application/octet-stream",
       "Content-Disposition": `attachment; filename="${file}"`,
+      "Content-Type": "application/octet-stream",
     },
   });
 }
