@@ -7,16 +7,12 @@ export default function SuccessClient() {
   const file = searchParams.get("file");
 
   if (!file) {
-    return (
-      <main className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p>No download found.</p>
-      </main>
-    );
+    return <p>No download found.</p>;
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-6">
-      <h1 className="text-3xl font-bold">Thank you for your purchase 🖤</h1>
+    <main className="min-h-screen bg-black text-white flex items-center justify-center flex-col gap-6">
+      <h1 className="text-4xl font-bold">Thank you 🖤</h1>
 
       <a
         href={file}
