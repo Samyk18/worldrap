@@ -10,17 +10,25 @@ export async function GET(req: Request) {
     return new NextResponse("Missing file", { status: 400 });
   }
 
-  const filePath = path.join(process.cwd(), "private_downloads", file);
+  // Bezpečné spracovanie názvu súboru
+  const fileName = path.basename(file);
+  const filePath = path.join(process.cwd(), "private_downloads", fileName);
 
   if (!fs.existsSync(filePath)) {
     return new NextResponse("File not found", { status: 404 });
+  }
+
+  // Tu pridaj overenie platby / tokenu
+  const paid = true; // <-- zmeň na reálne overenie
+  if (!paid) {
+    return new NextResponse("Unauthorized", { status: 403 });
   }
 
   const buffer = fs.readFileSync(filePath);
 
   return new NextResponse(buffer, {
     headers: {
-      "Content-Disposition": `attachment; filename="${file}"`,
+      "Content-Disposition": `attachment; filename="${fileName}"`,
       "Content-Type": "application/octet-stream",
     },
   });
