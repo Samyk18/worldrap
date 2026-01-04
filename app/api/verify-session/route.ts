@@ -6,17 +6,28 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 export async function POST(req: Request) {
   const { sessionId } = await req.json();
 
-  if (!sessionId) {
-    return NextResponse.json({ error: "No session id" }, { status: 400 });
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ["line_items"],
+  });
+
+  if (session.payment_status !== "paid") {
+    return NextResponse.json({ error: "Not paid" }, { status: 403 });
   }
 
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const fileMap: Record<string, string> = {
+    "Starter Rap Presets": "/downloads/starter-presets.zip",
+    "Rap Preset Pack Vol.1": "/downloads/rap-pack-vol1.zip",
+    "Rap Blueprint (PDF)": "/downloads/rap-blueprint.pdf",
+  };
 
-  const file = session.metadata?.file;
+  const productName =
+    session.line_items?.data[0]?.description;
 
-  if (!file) {
-    return NextResponse.json({ error: "No file found" }, { status: 404 });
+  if (!productName || !fileMap[productName]) {
+    return NextResponse.json({ error: "No download found" }, { status: 404 });
   }
 
-  return NextResponse.json({ file });
+  return NextResponse.json({
+    file: fileMap[productName],
+  });
 }
