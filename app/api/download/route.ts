@@ -1,35 +1,31 @@
-import fs from "fs";
-import path from "path";
 import { NextResponse } from "next/server";
+import path from "path";
+import fs from "fs";
+import { downloadTokens } from "../verify-session/route";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const file = searchParams.get("file");
+  const token = searchParams.get("token");
 
-  if (!file) {
-    return new NextResponse("Missing file", { status: 400 });
+  if (!token || !downloadTokens.has(token)) {
+    return new NextResponse("Invalid or expired token", { status: 403 });
   }
 
-  // Bezpečné spracovanie názvu súboru
-  const fileName = path.basename(file);
-  const filePath = path.join(process.cwd(), "private_downloads", fileName);
+  const fileName = downloadTokens.get(token)!;
+  downloadTokens.delete(token); // 🔥 JEDNORAZOVÝ LINK
+
+  const filePath = path.join(process.cwd(), "protected-files", fileName);
 
   if (!fs.existsSync(filePath)) {
     return new NextResponse("File not found", { status: 404 });
   }
 
-  // Tu pridaj overenie platby / tokenu
-  const paid = true; // <-- zmeň na reálne overenie
-  if (!paid) {
-    return new NextResponse("Unauthorized", { status: 403 });
-  }
+  const fileBuffer = fs.readFileSync(filePath);
 
-  const buffer = fs.readFileSync(filePath);
-
-  return new NextResponse(buffer, {
+  return new NextResponse(fileBuffer, {
     headers: {
-      "Content-Disposition": `attachment; filename="${fileName}"`,
       "Content-Type": "application/octet-stream",
+      "Content-Disposition": `attachment; filename="${fileName}"`,
     },
   });
 }
