@@ -20,8 +20,9 @@ export async function POST(req: Request) {
     "Rap Blueprint (PDF)": "/downloads/rap-blueprint.pdf",
   };
 
+  // Tu je oprava:
   const productName =
-    session.line_items?.data[0]?.description;
+    session.line_items?.data[0]?.price?.product_data?.name;
 
   if (!productName || !fileMap[productName]) {
     return NextResponse.json({ error: "No download found" }, { status: 404 });
